@@ -1,0 +1,8 @@
+#The size of each plot
+PLOT_SIZE: 15
+#The y-coord the islands are built on
+HEIGHT: 30
+#The world players will join in. Don't worry if this world doesn't exist, we'll make it for you!
+SPAWN_WORLD: 'Spawn'
+#The world islands are created in. Don't worry if this world doesn't exist, we'll make it for you!
+SKYBLOCK_WORLD: 'Skyblock'

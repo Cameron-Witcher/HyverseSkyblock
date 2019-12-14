@@ -1,0 +1,9 @@
+name: HyverseSkyblock
+author: QuickScythe
+version: ALPHA
+api-version: 1.13
+main: me.quickscythe.hyverse.skyblock.Main
+commands:
+  island:
+    description: The main island command.
+    aliases: ['is']
