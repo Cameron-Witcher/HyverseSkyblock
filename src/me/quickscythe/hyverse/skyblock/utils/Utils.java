@@ -75,9 +75,7 @@ public class Utils {
 			for (File file : new File(Main.getPlugin().getDataFolder() + "/Players").listFiles()) {
 				if (file.getName().replace(".yml", "").equals(uid + "")) {
 					FileConfiguration fc = YamlConfiguration.loadConfiguration(file);
-
-					SkyblockPlayer player = new SkyblockPlayer(uid, fc.getInt("Max_Islands"));
-
+					SkyblockPlayer player = new SkyblockPlayer(uid, Integer.parseInt(fc.getString("Max_Islands")));
 					for (String s : fc.getStringList("Islands")) {
 						player.addIsland(Integer.parseInt(s));
 					}
@@ -88,7 +86,8 @@ public class Utils {
 			}
 
 		} catch (NullPointerException ex) {
-
+			new File(Main.getPlugin().getDataFolder() + "/Players").mkdir();
+			
 		}
 		if (Bukkit.getPlayer(uid) == null) {
 			Bukkit.getConsoleSender().sendMessage(CoreUtils
@@ -115,10 +114,13 @@ public class Utils {
 		}
 		if (mi == 0)
 			mi = 1;
+		
 
 		SkyblockPlayer player = new SkyblockPlayer(uid, mi);
 
 		sbplayers.put(uid, player);
+		
+		saveSkyblockPlayer(player);
 
 		return player;
 
@@ -132,7 +134,7 @@ public class Utils {
 	public static void saveSkyblockPlayer(SkyblockPlayer player) {
 		File file;
 		try {
-			file = new File(Main.getPlugin().getDataFolder().getPath() + "/Players");
+			file = new File(Main.getPlugin().getDataFolder() + "/Players/" + player.getUUID() + ".yml");
 		} catch (NullPointerException ex) {
 			// Create a file for this player
 			new File(Main.getPlugin().getDataFolder() + "/Players").mkdir();
@@ -155,7 +157,6 @@ public class Utils {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	public static Schematic loadSchematic(String fn) throws NullPointerException {

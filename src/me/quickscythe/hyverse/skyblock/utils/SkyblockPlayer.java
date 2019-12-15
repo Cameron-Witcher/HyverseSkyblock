@@ -8,7 +8,7 @@ import org.bukkit.Bukkit;
 
 public class SkyblockPlayer {
 	
-	int maxislands = 0;
+	private int maxislands = 0;
 	
 	List<String> islands = new ArrayList<>();
 	
@@ -24,7 +24,10 @@ public class SkyblockPlayer {
 		this.islands = islands;
 	}
 	public void addIsland(int id) {
-		islands.add(id+"");
+		if(!islands.contains(id+"")) {
+			islands.add(id+"");
+		}
+		
 	}
 
 	public UUID getUUID() {
@@ -42,7 +45,7 @@ public class SkyblockPlayer {
 	}
 
 	public void removeIsland(int pid) {
-		islands.remove((Object)pid);
+		islands.remove(pid+"");
 	}
 
 }

@@ -32,7 +32,7 @@ public class IslandCommand implements CommandExecutor {
 				}
 				if (pl.getIslands().size() == 1) {
 					player.setMetadata("islandmenu", new FixedMetadataValue(Main.getPlugin(), "1"));
-					player.openInventory(IslandManager.getIslandMenuGUI(player, (int)pl.getIslands().toArray()[0]));
+					player.openInventory(IslandManager.getIslandMenuGUI(player, Integer.parseInt(pl.getIslands().toArray()[0]+"")));
 				}
 				if(pl.getIslands().size() > 1) {
 					player.setMetadata("islandselector", new FixedMetadataValue(Main.getPlugin(), "true"));

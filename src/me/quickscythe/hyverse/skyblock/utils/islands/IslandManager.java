@@ -29,7 +29,8 @@ public class IslandManager {
 
 	static Map<String, Island> islands = new HashMap<>();
 	public static List<IslandType> types = new ArrayList<>();
-	public static char[] alphebet = new char[] {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','Y','Z','a','b'};
+	public static char[] alphebet = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+			'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'Y', 'Z', 'a', 'b' };
 
 	private static int HEIGHT = 30;
 	public static int PLOT_SIZE = 15;
@@ -63,38 +64,43 @@ public class IslandManager {
 			createDemoType();
 		}
 
-		for (File file : getAllIslands()) {
+		try {
+			for (File file : getAllIslands()) {
 
-			FileConfiguration fc = YamlConfiguration.loadConfiguration(file);
+				FileConfiguration fc = YamlConfiguration.loadConfiguration(file);
 
-			int id = Integer.parseInt(file.getName().replace(".yml", ""));
+				int id = Integer.parseInt(file.getName().replace(".yml", ""));
 
-			Coord pos = getIslandLocation(id);
-			String sc = fc.getString("Type");
-			IslandType type = null;
-			for (IslandType t : types) {
-				if (t.getFileName().equals(sc)) {
-					type = t;
-					break;
+				Coord pos = getIslandLocation(id);
+				String sc = fc.getString("Type");
+				IslandType type = null;
+				for (IslandType t : types) {
+					if (t.getFileName().equals(sc)) {
+						type = t;
+						break;
+					}
 				}
-			}
-			if (type == null)
-				continue;
-			Island island;
-			if(!fc.getString("Owner").equals("null")) {
-				island = new Island(id, pos.getX()*PLOT_SIZE, pos.getY()*PLOT_SIZE, type, UUID.fromString(fc.getString("Owner")));
-				Utils.getSkyblockPlayer(UUID.fromString(fc.getString("Owner"))).addIsland(id);
+				if (type == null)
+					continue;
+				Island island;
+				if (!fc.getString("Owner").equals("null")) {
+					island = new Island(id, pos.getX() * PLOT_SIZE, pos.getY() * PLOT_SIZE, type,
+							UUID.fromString(fc.getString("Owner")));
+					Utils.getSkyblockPlayer(UUID.fromString(fc.getString("Owner"))).addIsland(id);
+					Bukkit.getConsoleSender().sendMessage(CoreUtils.colorize("Registered to player: " + id));
+				} else {
+					island = new Island(id, pos.getX() * PLOT_SIZE, pos.getY() * PLOT_SIZE, type, (Player) null);
+				}
+				island.setSpawnLocation(fc.getString("Spawn"));
+
+				islands.put(id + "", island);
+
 				Bukkit.getConsoleSender()
-				.sendMessage(CoreUtils.colorize("Registered to player: " + id));
-			} else {
-				island = new Island(id, pos.getX()*PLOT_SIZE, pos.getY()*PLOT_SIZE, type, (Player)null);
+						.sendMessage(CoreUtils.colorize("&e&lSkyblock &f>&7 Registered Island &f" + island.id + "&7."));
+
 			}
-			
-			islands.put(id+"",island);
-
-			Bukkit.getConsoleSender()
-					.sendMessage(CoreUtils.colorize("&e&lSkyblock &f>&7 Registered Island &f" + island.id + "&7."));
-
+		} catch (NullPointerException ex) {
+			new File(Main.getPlugin().getDataFolder() + "/islands/").mkdir();
 		}
 
 	}
@@ -103,8 +109,9 @@ public class IslandManager {
 		is.deactivate();
 		saveIsland(is);
 	}
+
 	public static void destroyIsland(int is) {
-		destroyIsland(islands.get(""+is));
+		destroyIsland(islands.get("" + is));
 	}
 
 	public static void saveIsland(Island is) {
@@ -113,6 +120,10 @@ public class IslandManager {
 		FileConfiguration fc = YamlConfiguration.loadConfiguration(file);
 		fc.set("Type", is.getType().schemfile + "");
 		fc.set("Owner", is.owner + "");
+		if (is.spawnLoc == null) {
+			fc.set("Spawn", "Na");
+		} else
+			fc.set("Spawn", is.spawnLoc.getX() + ":" + is.spawnLoc.getY() + ":" + is.spawnLoc.getZ());
 		try {
 			fc.save(file);
 		} catch (IOException e) {
@@ -178,8 +189,9 @@ public class IslandManager {
 				player);
 		island.build();
 		SkyblockPlayer spl = Utils.getSkyblockPlayer(player.getUniqueId());
-		spl.addIsland(island.getID());
-		islands.put((islands.size() + 1)+"", island);
+
+		Utils.saveSkyblockPlayer(spl);
+		islands.put((islands.size() + 1) + "", island);
 		return island;
 
 	}
@@ -212,70 +224,77 @@ public class IslandManager {
 	}
 
 	public static Inventory getIslandMenuGUI(Player player, int i) {
-		
+
 		SkyblockPlayer pl = Utils.getSkyblockPlayer(player.getUniqueId());
-		
+		Bukkit.broadcastMessage("Islands:");
+		for (String s : pl.getIslands()) {
+			Bukkit.broadcastMessage(s);
+		}
+		Bukkit.broadcastMessage("Max_Islands: " + pl.getMaxIslands());
+
 		InventoryCreator inv = new InventoryCreator("&e&lSkyblock Menu", player, 27);
-		inv.addItem(new ItemStack(Material.RED_BED), CoreUtils.colorize("&a&lHome"), 'A', new String[] {"&7Click to teleport to your home."});
-		inv.addItem(new ItemStack(Material.GRASS_BLOCK), CoreUtils.colorize("&e&lRegen Island"), 'B', new String[] {"&7Click to regenerate.","&7your island."});
-		
-		inv.addItem(new ItemStack(Material.BARRIER), "&4Delete Island", 'C', new String[] {"&7Click to delete this island"});
-		
-		if(pl.getMaxIslands() > 1 && pl.getMaxIslands() > pl.getIslands().size()) {
-			inv.addItem(new ItemStack(Material.WHEAT_SEEDS), CoreUtils.colorize("&b&lCreate New Island"), 'D', new String[] {"&7Click to create another island."});
-			
+		inv.addItem(new ItemStack(Material.RED_BED), CoreUtils.colorize("&a&lHome"), 'A',
+				new String[] { "&7Click to teleport to your home." });
+		inv.addItem(new ItemStack(Material.GRASS_BLOCK), CoreUtils.colorize("&e&lRegen Island"), 'B',
+				new String[] { "&7Click to regenerate.", "&7your island." });
+
+		inv.addItem(new ItemStack(Material.BARRIER), "&4Delete Island", 'C',
+				new String[] { "&7Click to delete this island" });
+
+		if (pl.getMaxIslands() > 1 && pl.getMaxIslands() > pl.getIslands().size()) {
+			inv.addItem(new ItemStack(Material.WHEAT_SEEDS), CoreUtils.colorize("&b&lCreate New Island"), 'D',
+					new String[] { "&7Click to create another island." });
+
 		} else {
-			inv.addItem(new ItemStack(Material.RED_STAINED_GLASS_PANE), CoreUtils.colorize("&4&lCreate New Island"), 'D', new String[] {"Sorry, you currently can","&7not access this option."});
-			
+			inv.addItem(new ItemStack(Material.RED_STAINED_GLASS_PANE), CoreUtils.colorize("&4&lCreate New Island"),
+					'D', new String[] { "Sorry, you currently can", "&7not access this option." });
+
 		}
 		inv.addItem(new ItemStack(Material.GRAY_STAINED_GLASS_PANE), "&7Click an option", 'X', (String[]) null);
-		
-		
-		inv.setConfiguration(new char[] {
-				'X','X','X','X','X','X','X','X','X',
-				'X','A','X','B','X','C','X','D','X',
-				'X','X','X','X','X','X','X','X','X'
-		});
-		
+
+		inv.setConfiguration(new char[] { 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'A', 'X', 'B', 'X', 'C',
+				'X', 'D', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' });
+
 		return inv.getInventory();
 
 	}
-	
+
 	public static Inventory getIslandSelectorGUI(Player player, List<String> islands2) {
-		
+
 		SkyblockPlayer pl = Utils.getSkyblockPlayer(player.getUniqueId());
-		
+
 		InventoryCreator inv = new InventoryCreator("&e&lSkyblock Menu", player, 27);
 		inv.addItem(new ItemStack(Material.GRAY_STAINED_GLASS_PANE), "&7Click an option", 'X', (String[]) null);
-		
+
 		ArrayList<Character> chars = new ArrayList<>();
-		for(int s=0;s!=11;s++) {
+		for (int s = 0; s != 11; s++) {
 			chars.add('X');
 		}
-		
+
 		int a = 0;
-		for(String i : islands2) {
-			//TODO
+		for (String i : islands2) {
+			// TODO
 			Bukkit.getConsoleSender().sendMessage("Island: " + i);
 			Bukkit.getConsoleSender().sendMessage("Char: " + alphebet[a]);
-			inv.addItem(islands.get(i).getType().getGUIItem(), i +"", alphebet[a], new String[] {"&7Click to manage this island."});
+			inv.addItem(new ItemStack(islands.get(i).getType().getGUIItem().getType()), i + "", alphebet[a],
+					new String[] { "&7Click to manage this island." });
 			chars.add(alphebet[a]);
-			a=a+1;
+			a = a + 1;
 		}
-		if(a<5) {
+		if (a < 5) {
 			inv.addItem(new ItemStack(Material.RED_STAINED_GLASS_PANE), "&cLocked...", alphebet[a], (String[]) null);
-			for(int f=a;f!=5;f++) {
-				
+			for (int f = a; f != 5; f++) {
+
 				chars.add(alphebet[a]);
 			}
 		}
-		
-		for(int s=0;s!=11;s++) {
+
+		for (int s = 0; s != 11; s++) {
 			chars.add('X');
 		}
-		
+
 		inv.setConfiguration(chars);
-		
+
 		return inv.getInventory();
 
 	}
@@ -377,9 +396,7 @@ public class IslandManager {
 	}
 
 	public static Island getIsland(int i) {
-		return islands.get(i+"");
+		return islands.get(i + "");
 	}
-
-	
 
 }

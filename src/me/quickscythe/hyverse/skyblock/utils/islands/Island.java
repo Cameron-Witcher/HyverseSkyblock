@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -42,8 +40,11 @@ public class Island {
 		// TODO DO NOT DO THIS IN ANY RELEASE
 		lgloc = new Location(Utils.getSkyblockWorld(), x, 30, z);
 		active = true;
-		if (owner != null)
+		if (owner != null) {
+			
 			this.owner = owner.getUniqueId();
+			Utils.getSkyblockPlayer(this.owner).addIsland(getID());
+		}
 		else
 			active = false;
 		this.file = new File(Main.getPlugin().getDataFolder() + "/islands/" + id + ".yml");
@@ -169,6 +170,7 @@ public class Island {
 		this.type = type;
 		this.owner = owner.getUniqueId();
 		IslandManager.saveIsland(this);
+		Utils.getSkyblockPlayer(owner.getUniqueId()).addIsland(getID());
 		build();
 	}
 
@@ -187,6 +189,7 @@ public class Island {
 	}
 
 	public void build() {
+		
 
 //		getLocation_LG().getBlock().setType(Material.RED_WOOL);
 
@@ -203,7 +206,7 @@ public class Island {
 						continue;
 					if (((SkyBlockData) (schem.getData().get(schem.getBlocks().toArray()[index]))).getMaterial()
 							.equals(Material.RED_WOOL)) {
-						spawnLoc = block.getLocation();
+						this.spawnLoc = block.getLocation();
 						continue;
 					}
 					block.setType(
@@ -235,6 +238,14 @@ public class Island {
 				}
 			}
 		}
+	}
+
+	public void setSpawnLocation(String loc) {
+		setSpawnLocation(new Location(Utils.getSkyblockWorld(), Float.parseFloat(loc.split(":")[0]), Float.parseFloat(loc.split(":")[1]), Float.parseFloat(loc.split(":")[2])));
+	}
+	public void setSpawnLocation(Location loc) {
+		spawnLoc = loc;
+		IslandManager.saveIsland(this);
 	}
 
 }

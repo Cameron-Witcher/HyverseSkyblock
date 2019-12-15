@@ -1,11 +1,13 @@
 package me.quickscythe.hyverse.skyblock.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import me.quickscythe.hyverse.skyblock.Main;
@@ -19,15 +21,27 @@ public class InventoryListener implements Listener {
 	public InventoryListener(Main plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
+	
+	@EventHandler
+	public void onInventoryClose(InventoryCloseEvent e) {
+		if(e.getPlayer().hasMetadata("islandmenu"))
+			e.getPlayer().removeMetadata("islandmenu", Main.getPlugin());
+		if(e.getPlayer().hasMetadata("islandtypeselector"))
+			e.getPlayer().removeMetadata("islandtypeselector", Main.getPlugin());
+		if(e.getPlayer().hasMetadata("islandselector"))
+			e.getPlayer().removeMetadata("islandselector", Main.getPlugin());
+	}
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
+		if (e.getCurrentItem() == null)
+			return;
 
 		if (e.getWhoClicked().hasMetadata("islandselector")) {
 			for (IslandType type : IslandManager.types) {
 				if (e.getCurrentItem().getType().equals(type.getGUIItem().getType())) {
 					e.getWhoClicked().removeMetadata("islandselector", Main.getPlugin());
-					e.getWhoClicked().closeInventory();
+//					e.getWhoClicked().closeInventory();
 					e.getWhoClicked().setMetadata("islandmenu", new FixedMetadataValue(Main.getPlugin(),
 							(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()))));
 					e.getWhoClicked().openInventory(IslandManager.getIslandMenuGUI((Player) e.getWhoClicked(),
@@ -46,7 +60,7 @@ public class InventoryListener implements Listener {
 
 					((Player) e.getWhoClicked()).teleport(is.getSpawnLocation());
 					e.getWhoClicked().removeMetadata("islandtypeselector", Main.getPlugin());
-					e.getWhoClicked().closeInventory();
+//					e.getWhoClicked().closeInventory();
 					break;
 				}
 			}
@@ -56,8 +70,7 @@ public class InventoryListener implements Listener {
 		}
 		if (e.getWhoClicked().hasMetadata("islandmenu")) {
 
-			if (e.getCurrentItem() == null)
-				return;
+			
 
 			if (e.getCurrentItem().getType().equals(Material.BARRIER)) {
 				IslandManager.destroyIsland(
@@ -65,8 +78,9 @@ public class InventoryListener implements Listener {
 				Utils.getSkyblockPlayer(e.getWhoClicked().getUniqueId()).removeIsland(
 						Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()));
 				e.getWhoClicked().teleport(Utils.getSpawnWorld().getSpawnLocation());
-				e.getWhoClicked().closeInventory();
+//				e.getWhoClicked().closeInventory();
 				e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
+				return;
 			}
 
 			if (e.getCurrentItem().getType().equals(Material.GRASS_BLOCK)) {
@@ -79,14 +93,14 @@ public class InventoryListener implements Listener {
 				((Player) e.getWhoClicked()).teleport(IslandManager
 						.getIsland(Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
 						.getSpawnLocation());
-				e.getWhoClicked().closeInventory();
+//				e.getWhoClicked().closeInventory();
 				e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 
 			}
 
 			if (e.getCurrentItem().getType().equals(Material.WHEAT_SEEDS)) {
 				e.getWhoClicked().setMetadata("islandtypeselector", new FixedMetadataValue(Main.getPlugin(), "true"));
-				e.getWhoClicked().closeInventory();
+//				e.getWhoClicked().closeInventory();
 				e.getWhoClicked().openInventory(IslandManager.getIslandTypeSelectorGUI((Player) e.getWhoClicked()));
 				e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 
@@ -96,16 +110,7 @@ public class InventoryListener implements Listener {
 				if (IslandManager
 						.getIsland(Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
 						.getSpawnLocation() == null) {
-//					boolean safe = false;
-//					int sx = 0;
-//					int sy = 0;
-//					Coord ipos = IslandManager.getIslandLocation(Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()));
-//					sx = ipos.getX()*IslandManager.PLOT_SIZE;
-//					sy = ipos.getY()*IslandManager.PLOT_SIZE;
-//					int l = 0;
-//					while(!safe) {
-//						
-//					}
+					Bukkit.broadcastMessage("No Spawn");
 				} else {
 					e.getWhoClicked().teleport(IslandManager
 							.getIsland(
