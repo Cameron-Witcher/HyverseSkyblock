@@ -23,6 +23,8 @@ import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
 import com.flowpowered.nbt.Tag;
 import com.flowpowered.nbt.stream.NBTInputStream;
+import com.github.yannicklamprecht.worldborder.api.BorderAPI;
+import com.github.yannicklamprecht.worldborder.api.WorldBorderApi;
 
 import me.hx64.voidgenerator.VoidGenerator;
 import me.hx64.voidgenerator.metrics.bukkit.Metrics;
@@ -34,21 +36,30 @@ public class Utils {
 	static Map<UUID, SkyblockPlayer> sbplayers = new HashMap<>();
 	static World spawnWorld = null;
 	static World skyblockWorld = null;
+	static WorldBorderApi wbapi = null;
 
 	public static World getSkyblockWorld() {
 		if (skyblockWorld == null) {
 			if (Bukkit.getWorld(Main.getPlugin().getConfig().getString("SKYBLOCK_WORLD")) == null) {
 				VoidGenerator vg = (VoidGenerator) Bukkit.getPluginManager().getPlugin("VoidGenerator");
 				WorldCreator c = new WorldCreator(Main.getPlugin().getConfig().getString("SKYBLOCK_WORLD"));
-				c.generator(vg.getDefaultWorldGenerator(Main.getPlugin().getConfig().getString("SKYBLOCK_WORLD"), "PLAINS"));
+				c.generator(vg.getDefaultWorldGenerator(Main.getPlugin().getConfig().getString("SKYBLOCK_WORLD"),
+						"PLAINS"));
 				skyblockWorld = c.createWorld();
 			} else {
 				skyblockWorld = Bukkit.getWorld(Main.getPlugin().getConfig().getString("SKYBLOCK_WORLD"));
 			}
 
-			
 		}
 		return skyblockWorld;
+	}
+
+	public static WorldBorderApi getWorldBorderAPI() {
+		if (wbapi == null)
+			wbapi = BorderAPI.getApi();
+
+		return wbapi;
+
 	}
 
 	public static World getSpawnWorld() {
@@ -56,13 +67,13 @@ public class Utils {
 			if (Bukkit.getWorld(Main.getPlugin().getConfig().getString("SPAWN_WORLD")) == null) {
 				VoidGenerator vg = (VoidGenerator) Bukkit.getPluginManager().getPlugin("VoidGenerator");
 				WorldCreator c = new WorldCreator(Main.getPlugin().getConfig().getString("SPAWN_WORLD"));
-				c.generator(vg.getDefaultWorldGenerator(Main.getPlugin().getConfig().getString("SPAWN_WORLD"), "PLAINS"));
+				c.generator(
+						vg.getDefaultWorldGenerator(Main.getPlugin().getConfig().getString("SPAWN_WORLD"), "PLAINS"));
 				spawnWorld = c.createWorld();
 			} else {
 				spawnWorld = Bukkit.getWorld(Main.getPlugin().getConfig().getString("SPAWN_WORLD"));
 			}
 
-			
 		}
 		return spawnWorld;
 	}
@@ -87,7 +98,7 @@ public class Utils {
 
 		} catch (NullPointerException ex) {
 			new File(Main.getPlugin().getDataFolder() + "/Players").mkdir();
-			
+
 		}
 		if (Bukkit.getPlayer(uid) == null) {
 			Bukkit.getConsoleSender().sendMessage(CoreUtils
@@ -114,12 +125,11 @@ public class Utils {
 		}
 		if (mi == 0)
 			mi = 1;
-		
 
 		SkyblockPlayer player = new SkyblockPlayer(uid, mi);
 
 		sbplayers.put(uid, player);
-		
+
 		saveSkyblockPlayer(player);
 
 		return player;

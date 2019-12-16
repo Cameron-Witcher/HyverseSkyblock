@@ -96,7 +96,7 @@ public class IslandManager {
 				islands.put(id + "", island);
 
 				Bukkit.getConsoleSender()
-						.sendMessage(CoreUtils.colorize("&e&lSkyblock &f>&7 Registered Island &f" + island.id + "&7."));
+						.sendMessage(CoreUtils.colorize("&e&lSkyblock &f>&7 Registered Island &f" + island.getID() + "&7."));
 
 			}
 		} catch (NullPointerException ex) {
@@ -116,14 +116,14 @@ public class IslandManager {
 
 	public static void saveIsland(Island is) {
 
-		File file = new File(Main.getPlugin().getDataFolder() + "/islands/" + is.id + ".yml");
+		File file = new File(Main.getPlugin().getDataFolder() + "/islands/" + is.getID() + ".yml");
 		FileConfiguration fc = YamlConfiguration.loadConfiguration(file);
 		fc.set("Type", is.getType().schemfile + "");
-		fc.set("Owner", is.owner + "");
-		if (is.spawnLoc == null) {
+		fc.set("Owner", is.getOwner() + "");
+		if (is.getSpawnLocation() == null) {
 			fc.set("Spawn", "Na");
 		} else
-			fc.set("Spawn", is.spawnLoc.getX() + ":" + is.spawnLoc.getY() + ":" + is.spawnLoc.getZ());
+			fc.set("Spawn", is.getSpawnLocation().getX() + ":" + is.getSpawnLocation().getY() + ":" + is.getSpawnLocation().getZ());
 		try {
 			fc.save(file);
 		} catch (IOException e) {

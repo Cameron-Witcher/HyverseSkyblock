@@ -21,16 +21,17 @@ import me.quickscythe.hyverse.skyblock.utils.Utils;
 import me.quickscythe.hyversecore.utils.CoreUtils;
 
 public class Island {
-	int x = 0;
-	int z = 0;
-	int id = 0;
-	IslandType type;
-	boolean active = false;
-	UUID owner = null;
-	Location lgloc = null;
-	List<ItemStack> startingItems = new ArrayList<>();
-	File file;
-	Location spawnLoc = null;
+	private int x = 0;
+	private int z = 0;
+	private int id = 0;
+	private IslandType type;
+	private boolean active = false;
+
+	private UUID owner = null;
+	private Location lgloc = null;
+	private List<ItemStack> startingItems = new ArrayList<>();
+	private File file;
+	private Location spawnLoc = null;
 
 	public Island(int id, int x, int z, IslandType type, Player owner) {
 		this.id = id;
@@ -72,6 +73,9 @@ public class Island {
 		registerIsland();
 	}
 
+	public UUID getOwner() {
+		return owner;
+	}
 	public void registerIsland() {
 		try {
 			FileConfiguration fc = YamlConfiguration.loadConfiguration(this.file);
@@ -215,7 +219,12 @@ public class Island {
 				}
 			}
 		}
+		save();
 
+	}
+	
+	private void save() {
+		IslandManager.saveIsland(this);
 	}
 
 	public Location getSpawnLocation() {

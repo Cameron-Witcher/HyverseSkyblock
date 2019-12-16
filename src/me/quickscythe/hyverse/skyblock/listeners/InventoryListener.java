@@ -10,6 +10,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import com.github.yannicklamprecht.worldborder.api.BorderAPI;
+import com.github.yannicklamprecht.worldborder.api.WorldBorderApi;
+
 import me.quickscythe.hyverse.skyblock.Main;
 import me.quickscythe.hyverse.skyblock.utils.Utils;
 import me.quickscythe.hyverse.skyblock.utils.islands.Island;
@@ -21,19 +24,10 @@ public class InventoryListener implements Listener {
 	public InventoryListener(Main plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-	
-	@EventHandler
-	public void onInventoryClose(InventoryCloseEvent e) {
-		if(e.getPlayer().hasMetadata("islandmenu"))
-			e.getPlayer().removeMetadata("islandmenu", Main.getPlugin());
-		if(e.getPlayer().hasMetadata("islandtypeselector"))
-			e.getPlayer().removeMetadata("islandtypeselector", Main.getPlugin());
-		if(e.getPlayer().hasMetadata("islandselector"))
-			e.getPlayer().removeMetadata("islandselector", Main.getPlugin());
-	}
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
+
 		if (e.getCurrentItem() == null)
 			return;
 
@@ -41,7 +35,6 @@ public class InventoryListener implements Listener {
 			for (IslandType type : IslandManager.types) {
 				if (e.getCurrentItem().getType().equals(type.getGUIItem().getType())) {
 					e.getWhoClicked().removeMetadata("islandselector", Main.getPlugin());
-//					e.getWhoClicked().closeInventory();
 					e.getWhoClicked().setMetadata("islandmenu", new FixedMetadataValue(Main.getPlugin(),
 							(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()))));
 					e.getWhoClicked().openInventory(IslandManager.getIslandMenuGUI((Player) e.getWhoClicked(),
@@ -59,8 +52,9 @@ public class InventoryListener implements Listener {
 					Island is = IslandManager.nextIsland((Player) e.getWhoClicked(), itype);
 
 					((Player) e.getWhoClicked()).teleport(is.getSpawnLocation());
+					Utils.getWorldBorderAPI().setBorder(((Player) (e.getWhoClicked())), IslandManager.PLOT_SIZE,
+							is.getLocation_LG().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
 					e.getWhoClicked().removeMetadata("islandtypeselector", Main.getPlugin());
-//					e.getWhoClicked().closeInventory();
 					break;
 				}
 			}
@@ -70,15 +64,12 @@ public class InventoryListener implements Listener {
 		}
 		if (e.getWhoClicked().hasMetadata("islandmenu")) {
 
-			
-
 			if (e.getCurrentItem().getType().equals(Material.BARRIER)) {
 				IslandManager.destroyIsland(
 						Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()));
 				Utils.getSkyblockPlayer(e.getWhoClicked().getUniqueId()).removeIsland(
 						Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()));
 				e.getWhoClicked().teleport(Utils.getSpawnWorld().getSpawnLocation());
-//				e.getWhoClicked().closeInventory();
 				e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 				return;
 			}
@@ -93,14 +84,17 @@ public class InventoryListener implements Listener {
 				((Player) e.getWhoClicked()).teleport(IslandManager
 						.getIsland(Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
 						.getSpawnLocation());
-//				e.getWhoClicked().closeInventory();
+				Utils.getWorldBorderAPI().setBorder(((Player) (e.getWhoClicked())), IslandManager.PLOT_SIZE,
+						IslandManager
+								.getIsland(Integer
+										.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
+								.getLocation_LG().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
 				e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 
 			}
 
 			if (e.getCurrentItem().getType().equals(Material.WHEAT_SEEDS)) {
 				e.getWhoClicked().setMetadata("islandtypeselector", new FixedMetadataValue(Main.getPlugin(), "true"));
-//				e.getWhoClicked().closeInventory();
 				e.getWhoClicked().openInventory(IslandManager.getIslandTypeSelectorGUI((Player) e.getWhoClicked()));
 				e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 
@@ -116,6 +110,13 @@ public class InventoryListener implements Listener {
 							.getIsland(
 									Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
 							.getSpawnLocation());
+
+					Utils.getWorldBorderAPI().setBorder(((Player) (e.getWhoClicked())), IslandManager.PLOT_SIZE,
+							IslandManager
+									.getIsland(Integer
+											.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
+									.getLocation_LG()
+									.add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
 					e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 				}
 

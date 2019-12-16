@@ -4,6 +4,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="C:/Users/Elric/Developer Stuff/Jars/VoidGenerator-1.4.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Elric/Developer Stuff/Jars/My Plugins/HyverseCore.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Elric/Developer Stuff/Jars/Spigot-1.14.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Elric/Developer Stuff/Jars/spigot-1.15.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Elric/Developer Stuff/Jars/My Plugins/HyverseWorldBorderAPI.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

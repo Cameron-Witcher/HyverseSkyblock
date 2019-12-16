@@ -19,6 +19,13 @@ public class Main extends JavaPlugin {
 	int maxattempts = 3;
 
 	public void onEnable() {
+		
+		if(!getConfig().isSet("PLOT_SIZE")) getConfig().set("PLOT_SIZE", 20);
+		if(!getConfig().isSet("HEIGHT")) getConfig().set("HEIGHT", 50);
+		if(!getConfig().isSet("SPAWN_WORLD")) getConfig().set("SPAWN_WORLD", "Spawn");
+		if(!getConfig().isSet("SKYBLOCK_WORLD")) getConfig().set("SKYBLOCK_WORLD", "Skyblock");
+		
+		saveConfig();
 		if(!getServer().getPluginManager().isPluginEnabled("HyverseCore") || !getServer().getPluginManager().isPluginEnabled("VoidGenerator")){
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&e&l" + getDescription().getName() + " &f>&7 Can't find HyverseCore. Trying again.. Attempt " + attempt + " out of " + maxattempts));
 			attempt+=1;
