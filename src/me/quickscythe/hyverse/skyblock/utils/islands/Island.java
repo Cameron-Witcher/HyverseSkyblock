@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -34,26 +35,27 @@ public class Island {
 	private Location spawnLoc = null;
 
 	public Island(int id, int x, int z, IslandType type, Player owner) {
-		this.id = id;
-		this.x = x;
-		this.z = z;
-		this.type = type;
-		// TODO DO NOT DO THIS IN ANY RELEASE
-		lgloc = new Location(Utils.getSkyblockWorld(), x, 30, z);
-		active = true;
-		if (owner != null) {
-			
-			this.owner = owner.getUniqueId();
-			Utils.getSkyblockPlayer(this.owner).addIsland(getID());
-		}
-		else
-			active = false;
-		this.file = new File(Main.getPlugin().getDataFolder() + "/islands/" + id + ".yml");
-		if (!file.exists()) {
-			createFiles();
-			createDemoFile();
-		}
-		registerIsland();
+		this(id,x,z,type,owner.getUniqueId());
+//		this.id = id;
+//		this.x = x;
+//		this.z = z;
+//		this.type = type;
+//		// TODO DO NOT DO THIS IN ANY RELEASE
+//		lgloc = new Location(Utils.getSkyblockWorld(), x, 30, z);
+//		active = true;
+//		if (owner != null) {
+//			
+//			this.owner = owner.getUniqueId();
+//			Utils.getSkyblockPlayer(this.owner).addIsland(getID());
+//		}
+//		else
+//			active = false;
+//		this.file = new File(Main.getPlugin().getDataFolder() + "/islands/" + id + ".yml");
+//		if (!file.exists()) {
+//			createFiles();
+//			createDemoFile();
+//		}
+//		registerIsland();
 	}
 
 	public Island(int id, int x, int z, IslandType type, UUID owner) {

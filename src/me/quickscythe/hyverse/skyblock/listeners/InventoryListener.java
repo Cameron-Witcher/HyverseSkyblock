@@ -63,32 +63,23 @@ public class InventoryListener implements Listener {
 
 		}
 		if (e.getWhoClicked().hasMetadata("islandmenu")) {
+			Island is = IslandManager
+					.getIsland(Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()));
 
 			if (e.getCurrentItem().getType().equals(Material.BARRIER)) {
-				IslandManager.destroyIsland(
-						Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()));
-				Utils.getSkyblockPlayer(e.getWhoClicked().getUniqueId()).removeIsland(
-						Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()));
+				IslandManager.destroyIsland(is.getID());
+				Utils.getSkyblockPlayer(e.getWhoClicked().getUniqueId()).removeIsland(is.getID());
 				e.getWhoClicked().teleport(Utils.getSpawnWorld().getSpawnLocation());
 				e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 				return;
 			}
 
 			if (e.getCurrentItem().getType().equals(Material.GRASS_BLOCK)) {
-				IslandManager
-						.getIsland(Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
-						.destroy_SOFT();
-				IslandManager
-						.getIsland(Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
-						.build();
-				((Player) e.getWhoClicked()).teleport(IslandManager
-						.getIsland(Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
-						.getSpawnLocation());
+				is.destroy_SOFT();
+				is.build();
+				((Player) e.getWhoClicked()).teleport(is.getSpawnLocation());
 				Utils.getWorldBorderAPI().setBorder(((Player) (e.getWhoClicked())), IslandManager.PLOT_SIZE,
-						IslandManager
-								.getIsland(Integer
-										.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
-								.getLocation_LG().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
+						is.getLocation_LG().clone().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
 				e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 
 			}
@@ -112,11 +103,7 @@ public class InventoryListener implements Listener {
 							.getSpawnLocation());
 
 					Utils.getWorldBorderAPI().setBorder(((Player) (e.getWhoClicked())), IslandManager.PLOT_SIZE,
-							IslandManager
-									.getIsland(Integer
-											.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
-									.getLocation_LG()
-									.add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
+							is.getLocation_LG().clone().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
 					e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 				}
 
