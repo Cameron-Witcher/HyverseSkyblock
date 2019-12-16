@@ -248,11 +248,6 @@ public class IslandManager {
 	public static Inventory getIslandMenuGUI(Player player, int i) {
 
 		SkyblockPlayer pl = Utils.getSkyblockPlayer(player.getUniqueId());
-		Bukkit.broadcastMessage("Islands:");
-		for (String s : pl.getIslands()) {
-			Bukkit.broadcastMessage(s);
-		}
-		Bukkit.broadcastMessage("Max_Islands: " + pl.getMaxIslands());
 
 		InventoryCreator inv = new InventoryCreator("&e&lSkyblock Menu", player, 27);
 		inv.addItem(new ItemStack(Material.RED_BED), CoreUtils.colorize("&a&lHome"), 'A',
@@ -296,8 +291,6 @@ public class IslandManager {
 		int a = 0;
 		for (String i : islands2) {
 			// TODO
-			Bukkit.getConsoleSender().sendMessage("Island: " + i);
-			Bukkit.getConsoleSender().sendMessage("Char: " + alphebet[a]);
 			inv.addItem(new ItemStack(islands.get(i).getType().getGUIItem().getType()), i + "", alphebet[a],
 					new String[] { "&7Click to manage this island." });
 			chars.add(alphebet[a]);

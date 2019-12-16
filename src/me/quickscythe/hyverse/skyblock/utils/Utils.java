@@ -172,7 +172,6 @@ public class Utils {
 	public static Schematic loadSchematic(String fn) throws NullPointerException {
 		try {
 			File f = new File(Main.getPlugin().getDataFolder().getPath() + "/" + fn);
-			Bukkit.broadcastMessage(Main.getPlugin().getDataFolder().getPath() + "/" + fn);
 			FileInputStream fis = new FileInputStream(f);
 			NBTInputStream input = new NBTInputStream(fis);
 

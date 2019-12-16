@@ -46,9 +46,6 @@ public class SkyblockPlayer {
 		return maxislands;
 	}
 	public List<String> getIslands(){
-		for(String s : islands) {
-			Bukkit.getConsoleSender().sendMessage(s);
-		}
 		return islands;
 	}
 

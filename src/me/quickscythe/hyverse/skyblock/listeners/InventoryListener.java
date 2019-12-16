@@ -89,7 +89,6 @@ public class InventoryListener implements Listener {
 
 			if (e.getCurrentItem().getType().equals(Material.RED_BED)) {
 				if (is.getSpawnLocation() == null) {
-					Bukkit.broadcastMessage("No Spawn");
 				} else {
 					is.join(((Player)e.getWhoClicked()));
 					e.getWhoClicked().closeInventory();
