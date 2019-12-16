@@ -54,6 +54,9 @@ public class IslandCommand implements CommandExecutor {
 					String home = pl.getIsland();
 					if(args.length == 2) 
 						home = args[1];
+					if(home.equals("")) {
+						player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Sorry you must join an island first."));
+					}
 					if(player.hasPermission("hyverse.skyblock.cmd.admin.home")) {
 						IslandManager.getIsland(Integer.parseInt(home)).join(player);
 					} else {

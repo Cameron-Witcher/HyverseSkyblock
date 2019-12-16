@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -21,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import me.quickscythe.hyverse.skyblock.Main;
 import me.quickscythe.hyverse.skyblock.utils.Schematic;
 import me.quickscythe.hyverse.skyblock.utils.SkyBlockData;
+import me.quickscythe.hyverse.skyblock.utils.SkyblockPlayer;
 import me.quickscythe.hyverse.skyblock.utils.Utils;
 import me.quickscythe.hyversecore.utils.CoreUtils;
 
@@ -36,7 +36,7 @@ public class Island {
 	private List<ItemStack> startingItems = new ArrayList<>();
 	private File file;
 	private Location spawnLoc = null;
-	private Map<UUID, Inventory> inventories = new HashMap<>();
+	private Map<UUID, List<ItemStack>> inventories = new HashMap<>();
 
 	public Island(int id, int x, int z, IslandType type, Player owner) {
 		this(id, x, z, type, owner.getUniqueId());
@@ -80,30 +80,72 @@ public class Island {
 	}
 
 	public void leave(Player player) {
-		inventories.put(player.getUniqueId(), player.getInventory());
+		inventories.get(player.getUniqueId()).clear();
+		player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f You have left Island " + id));
+		for (ItemStack item : player.getInventory().getContents()) {
+			if (item == null)
+				continue;
+			if (!item.getType().equals(Material.AIR)) {
+					inventories.get(player.getUniqueId()).add(item); 
+			}
+		}
+		CoreUtils.debug("Saved inv on leave. id: " + id + " Size: " + inventories.get(player.getUniqueId()).size());
 		save();
 	}
 
 	public void join(Player player) {
-		if(!Utils.getSkyblockPlayer(player.getUniqueId()).getIsland().equals(id) && !Utils.getSkyblockPlayer(player.getUniqueId()).getIsland().equals("")) {
-			IslandManager.getIsland(Integer.parseInt(Utils.getSkyblockPlayer(player.getUniqueId()).getIsland())).leave(player);
+		if (!inventories.containsKey(player.getUniqueId()))inventories.put(player.getUniqueId(), new ArrayList<ItemStack>());
+		SkyblockPlayer pl = Utils.getSkyblockPlayer(player.getUniqueId());
+
+		if (!pl.getIsland().equals(id + "")) {
+
+			if (!pl.getIsland().equals(""))
+				IslandManager.getIsland(Integer.parseInt(pl.getIsland())).leave(player);
+			player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Joining Island " + id));
+			player.getInventory().clear();
+
+			CoreUtils.debug("1");
+			if (inventories.get(player.getUniqueId()) == null) {
+				CoreUtils.debug("2");
+				givePlayerStartingItems(player);
+
+			} else {
+				CoreUtils.debug("3");
+				returnPlayerItems(player);
+			}
+
+			pl.setIsland(getID() + "");
+			Utils.getWorldBorderAPI().setBorder(player, IslandManager.PLOT_SIZE,
+					getLocation_LG().clone().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
 		}
+		player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Teleporting to Island: " + id));
 		player.teleport(spawnLoc);
-		player.getInventory().clear();
-		if(inventories.get(player.getUniqueId()) == null) {
-			for(ItemStack i : startingItems) {
-				if(i == null) continue;
-				player.getInventory().addItem(i);
+
+	}
+
+	private void returnPlayerItems(Player player) {
+		CoreUtils.debug("3-1");
+		for (ItemStack i : inventories.get(player.getUniqueId())) {
+			CoreUtils.debug("3-2");
+			if (i == null) {
+				CoreUtils.debug("3-3");
+				continue;
 			}
-		} else {
-			for(ItemStack i : inventories.get(player.getUniqueId())) {
-				if(i == null) continue;
-				player.getInventory().addItem(i);
-			}
+			CoreUtils.debug("3-4");
+			CoreUtils.debug(i.getType() + "");
+			player.getInventory().addItem(i.clone());
 		}
-		Utils.getSkyblockPlayer(player.getUniqueId()).setIsland(getID() + "");
-		Utils.getWorldBorderAPI().setBorder(player, IslandManager.PLOT_SIZE,
-				getLocation_LG().clone().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
+
+	}
+
+	private void givePlayerStartingItems(Player player) {
+		player.sendMessage(CoreUtils.colorize("&aHere, you look like you could use a little help."));
+		for (ItemStack i : startingItems) {
+			CoreUtils.debug("2-1");
+			if (i == null)
+				continue;
+			player.getInventory().addItem(i.clone());
+		}
 	}
 
 	public UUID getOwner() {
@@ -292,12 +334,12 @@ public class Island {
 		IslandManager.saveIsland(this);
 	}
 
-	public Map<UUID, Inventory> getInventories() {
+	public Map<UUID, List<ItemStack>> getInventories() {
 		return inventories;
 	}
 
-	public void addInventory(UUID uid, Inventory inv) {
-		inventories.put(uid, inv);
-	}
+//	public void addInventory(UUID uid, Inventory inv) {
+//		inventories.put(uid, inv);
+//	}
 
 }

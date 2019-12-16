@@ -96,11 +96,9 @@ public class IslandManager {
 				
 				if(fc.isSet("Players")) {
 					for(String uid : fc.getStringList("Players")) {
-						Inventory inv = Bukkit.createInventory(null, 36);
 						for(String item : fc.getStringList("Inventories." + uid)) {
-							inv.addItem(CoreUtils.decryptItemStack(item));
+							island.getInventories().get(UUID.fromString(uid)).add(CoreUtils.decryptItemStack(item));
 						}
-						island.addInventory(UUID.fromString(uid),inv);
 					}
 				}
 
@@ -137,10 +135,10 @@ public class IslandManager {
 			fc.set("Spawn", is.getSpawnLocation().getX() + ":" + is.getSpawnLocation().getY() + ":" + is.getSpawnLocation().getZ());
 		
 		List<String> uids = new ArrayList<>();
-		for(Entry<UUID,Inventory> e : is.getInventories().entrySet()) {
+		for(Entry<UUID,List<ItemStack>> e : is.getInventories().entrySet()) {
 			uids.add(e.getKey()+"");
 			List<String> items = new ArrayList<>();
-			for(ItemStack i : e.getValue().getContents()) {
+			for(ItemStack i : e.getValue()) {
 				items.add(CoreUtils.encryptItemStack(i));
 			}
 			fc.set("Players", uids);
