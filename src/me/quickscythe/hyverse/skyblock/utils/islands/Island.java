@@ -3,7 +3,9 @@ package me.quickscythe.hyverse.skyblock.utils.islands;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -13,6 +15,7 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import me.quickscythe.hyverse.skyblock.Main;
@@ -33,9 +36,10 @@ public class Island {
 	private List<ItemStack> startingItems = new ArrayList<>();
 	private File file;
 	private Location spawnLoc = null;
+	private Map<UUID, Inventory> inventories = new HashMap<>();
 
 	public Island(int id, int x, int z, IslandType type, Player owner) {
-		this(id,x,z,type,owner.getUniqueId());
+		this(id, x, z, type, owner.getUniqueId());
 //		this.id = id;
 //		this.x = x;
 //		this.z = z;
@@ -75,9 +79,37 @@ public class Island {
 		registerIsland();
 	}
 
+	public void leave(Player player) {
+		inventories.put(player.getUniqueId(), player.getInventory());
+		save();
+	}
+
+	public void join(Player player) {
+		if(!Utils.getSkyblockPlayer(player.getUniqueId()).getIsland().equals(id) && !Utils.getSkyblockPlayer(player.getUniqueId()).getIsland().equals("")) {
+			IslandManager.getIsland(Integer.parseInt(Utils.getSkyblockPlayer(player.getUniqueId()).getIsland())).leave(player);
+		}
+		player.teleport(spawnLoc);
+		player.getInventory().clear();
+		if(inventories.get(player.getUniqueId()) == null) {
+			for(ItemStack i : startingItems) {
+				if(i == null) continue;
+				player.getInventory().addItem(i);
+			}
+		} else {
+			for(ItemStack i : inventories.get(player.getUniqueId())) {
+				if(i == null) continue;
+				player.getInventory().addItem(i);
+			}
+		}
+		Utils.getSkyblockPlayer(player.getUniqueId()).setIsland(getID() + "");
+		Utils.getWorldBorderAPI().setBorder(player, IslandManager.PLOT_SIZE,
+				getLocation_LG().clone().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
+	}
+
 	public UUID getOwner() {
 		return owner;
 	}
+
 	public void registerIsland() {
 		try {
 			FileConfiguration fc = YamlConfiguration.loadConfiguration(this.file);
@@ -195,7 +227,6 @@ public class Island {
 	}
 
 	public void build() {
-		
 
 //		getLocation_LG().getBlock().setType(Material.RED_WOOL);
 
@@ -224,7 +255,7 @@ public class Island {
 		save();
 
 	}
-	
+
 	private void save() {
 		IslandManager.saveIsland(this);
 	}
@@ -252,11 +283,21 @@ public class Island {
 	}
 
 	public void setSpawnLocation(String loc) {
-		setSpawnLocation(new Location(Utils.getSkyblockWorld(), Float.parseFloat(loc.split(":")[0]), Float.parseFloat(loc.split(":")[1]), Float.parseFloat(loc.split(":")[2])));
+		setSpawnLocation(new Location(Utils.getSkyblockWorld(), Float.parseFloat(loc.split(":")[0]),
+				Float.parseFloat(loc.split(":")[1]), Float.parseFloat(loc.split(":")[2])));
 	}
+
 	public void setSpawnLocation(Location loc) {
 		spawnLoc = loc;
 		IslandManager.saveIsland(this);
+	}
+
+	public Map<UUID, Inventory> getInventories() {
+		return inventories;
+	}
+
+	public void addInventory(UUID uid, Inventory inv) {
+		inventories.put(uid, inv);
 	}
 
 }

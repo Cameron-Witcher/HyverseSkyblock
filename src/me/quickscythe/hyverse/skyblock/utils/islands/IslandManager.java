@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -92,6 +93,16 @@ public class IslandManager {
 					island = new Island(id, pos.getX() * PLOT_SIZE, pos.getY() * PLOT_SIZE, type, (Player) null);
 				}
 				island.setSpawnLocation(fc.getString("Spawn"));
+				
+				if(fc.isSet("Players")) {
+					for(String uid : fc.getStringList("Players")) {
+						Inventory inv = Bukkit.createInventory(null, 36);
+						for(String item : fc.getStringList("Inventories." + uid)) {
+							inv.addItem(CoreUtils.decryptItemStack(item));
+						}
+						island.addInventory(UUID.fromString(uid),inv);
+					}
+				}
 
 				islands.put(id + "", island);
 
@@ -124,6 +135,17 @@ public class IslandManager {
 			fc.set("Spawn", "Na");
 		} else
 			fc.set("Spawn", is.getSpawnLocation().getX() + ":" + is.getSpawnLocation().getY() + ":" + is.getSpawnLocation().getZ());
+		
+		List<String> uids = new ArrayList<>();
+		for(Entry<UUID,Inventory> e : is.getInventories().entrySet()) {
+			uids.add(e.getKey()+"");
+			List<String> items = new ArrayList<>();
+			for(ItemStack i : e.getValue().getContents()) {
+				items.add(CoreUtils.encryptItemStack(i));
+			}
+			fc.set("Players", uids);
+			fc.set("Inventories." + e.getKey(), items);
+		}
 		try {
 			fc.save(file);
 		} catch (IOException e) {

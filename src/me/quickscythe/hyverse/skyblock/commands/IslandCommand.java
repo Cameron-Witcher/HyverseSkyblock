@@ -1,12 +1,11 @@
 package me.quickscythe.hyverse.skyblock.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
-import org.bukkit.plugin.Plugin;
 
 import me.quickscythe.hyverse.skyblock.Main;
 import me.quickscythe.hyverse.skyblock.utils.SkyblockPlayer;
@@ -40,11 +39,60 @@ public class IslandCommand implements CommandExecutor {
 				}
 
 			}
+			if(args.length > 0) {
+				if(args[0].equalsIgnoreCase("help")) {
+					sender.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Below is a list of skyblock commands:"));
+					if(player.hasPermission("hyverse.skyblock.cmd.admin")) 
+						player.sendMessage(CoreUtils.colorize("&aKey: &c▬&a: Admin, &e▬&a: Other"));
+					
+					player.sendMessage(CoreUtils.colorize("&e - /is -> Opens GUI menu."));
+					player.sendMessage(CoreUtils.colorize("&e - /is help -> Shows these help messages."));
+					player.sendMessage(CoreUtils.colorize("&e - /is home [islandID] -> Teleports you to the spawn point of the island you are currently on, or the island you specify with the optional [islandID] argument.."));
+					if(player.hasPermission("hyverse.skyblock.cmd.admin.is.reset.metadata")) player.sendMessage(CoreUtils.colorize("&c - /is reset metadata [player] -> Resets you metadata or the metadata of the player specified with [player]"));
+				}
+				if(args[0].equalsIgnoreCase("home")) {
+					String home = pl.getIsland();
+					if(args.length == 2) 
+						home = args[1];
+					if(player.hasPermission("hyverse.skyblock.cmd.admin.home")) {
+						IslandManager.getIsland(Integer.parseInt(home)).join(player);
+					} else {
+						if(pl.getIslands().contains(home)) {
+							IslandManager.getIsland(Integer.parseInt(home)).join(player);
+						} else {
+							player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Sorry you don't own that island."));
+						}
+					}
+					
+					
+				}
+				if(args[0].equalsIgnoreCase("reset")) {
+					if(args.length >= 2) {
+						if(args[1].equalsIgnoreCase("metadata")) {
+							String plr = player.getName();
+							if(args.length == 3) {
+								plr = args[2];
+								if(Bukkit.getPlayer(plr) == null) {
+									player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f A player must me online to reset their metadata"));
+									return true;
+								}
+							}
+							Bukkit.getPlayer(plr).removeMetadata("islandmenu", Main.getPlugin());
+							Bukkit.getPlayer(plr).removeMetadata("islandtypeselector", Main.getPlugin());
+							Bukkit.getPlayer(plr).removeMetadata("islandselector", Main.getPlugin());
+						}
+					} else {
+						player.sendMessage(CoreUtils.colorize("&c - /is reset metadata [player] -> Resets you metadata or the metadata of the player specified with [player]."));
+					}
+					
+				}
+			}
 
 //			IslandManager.nextIsland(player, IslandManager.types.get(0)).build();
 
 		} else {
 			sender.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Below is a list of admin commands:"));
+			sender.sendMessage(CoreUtils.colorize("&e - /is reset metadata [player] -> Resets you metadata or the metadata of the player specified with [player]"));
 		}
 		return true;
 	}

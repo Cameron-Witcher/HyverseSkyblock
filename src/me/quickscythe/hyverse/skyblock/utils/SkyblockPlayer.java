@@ -11,6 +11,7 @@ public class SkyblockPlayer {
 	private int maxislands = 0;
 	
 	List<String> islands = new ArrayList<>();
+	String cisland = "";
 	
 	UUID uid;
 	
@@ -28,6 +29,13 @@ public class SkyblockPlayer {
 			islands.add(id+"");
 		}
 		
+	}
+	
+	public void setIsland(String island) {
+		cisland = island;
+	}
+	public String getIsland() {
+		return cisland;
 	}
 
 	public UUID getUUID() {

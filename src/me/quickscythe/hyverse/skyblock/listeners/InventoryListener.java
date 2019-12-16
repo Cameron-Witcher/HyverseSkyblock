@@ -50,10 +50,7 @@ public class InventoryListener implements Listener {
 			for (IslandType itype : IslandManager.types) {
 				if (e.getCurrentItem().getType().equals(itype.getGUIItem().getType())) {
 					Island is = IslandManager.nextIsland((Player) e.getWhoClicked(), itype);
-
-					((Player) e.getWhoClicked()).teleport(is.getSpawnLocation());
-					Utils.getWorldBorderAPI().setBorder(((Player) (e.getWhoClicked())), IslandManager.PLOT_SIZE,
-							is.getLocation_LG().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
+					is.join((Player)e.getWhoClicked());
 					e.getWhoClicked().removeMetadata("islandtypeselector", Main.getPlugin());
 					break;
 				}
@@ -67,6 +64,7 @@ public class InventoryListener implements Listener {
 					.getIsland(Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()));
 
 			if (e.getCurrentItem().getType().equals(Material.BARRIER)) {
+				is.leave((Player)e.getWhoClicked());
 				IslandManager.destroyIsland(is.getID());
 				Utils.getSkyblockPlayer(e.getWhoClicked().getUniqueId()).removeIsland(is.getID());
 				e.getWhoClicked().teleport(Utils.getSpawnWorld().getSpawnLocation());
@@ -77,9 +75,7 @@ public class InventoryListener implements Listener {
 			if (e.getCurrentItem().getType().equals(Material.GRASS_BLOCK)) {
 				is.destroy_SOFT();
 				is.build();
-				((Player) e.getWhoClicked()).teleport(is.getSpawnLocation());
-				Utils.getWorldBorderAPI().setBorder(((Player) (e.getWhoClicked())), IslandManager.PLOT_SIZE,
-						is.getLocation_LG().clone().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
+				is.join((Player)e.getWhoClicked());
 				e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 
 			}
@@ -92,18 +88,11 @@ public class InventoryListener implements Listener {
 			}
 
 			if (e.getCurrentItem().getType().equals(Material.RED_BED)) {
-				if (IslandManager
-						.getIsland(Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
-						.getSpawnLocation() == null) {
+				if (is.getSpawnLocation() == null) {
 					Bukkit.broadcastMessage("No Spawn");
 				} else {
-					e.getWhoClicked().teleport(IslandManager
-							.getIsland(
-									Integer.parseInt("" + e.getWhoClicked().getMetadata("islandmenu").get(0).value()))
-							.getSpawnLocation());
-
-					Utils.getWorldBorderAPI().setBorder(((Player) (e.getWhoClicked())), IslandManager.PLOT_SIZE,
-							is.getLocation_LG().clone().add((IslandManager.PLOT_SIZE / 2), 0, (IslandManager.PLOT_SIZE / 2)));
+					is.join(((Player)e.getWhoClicked()));
+					e.getWhoClicked().closeInventory();
 					e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 				}
 
