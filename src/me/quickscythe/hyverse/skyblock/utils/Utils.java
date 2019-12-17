@@ -136,9 +136,13 @@ public class Utils {
 
 	}
 
-	private static Tag getChildTag(Map<String, Tag> items, String key, Class<? extends Tag> expected) {
-		Tag tag = items.get(key);
-		return tag;
+	
+	
+	public static void saveSkyblockPlayer(Player player) {
+		saveSkyblockPlayer(getSkyblockPlayer(player.getUniqueId()));
+	}
+	public static void saveSkyblockPlayer(UUID player) {
+		saveSkyblockPlayer(getSkyblockPlayer(player));
 	}
 
 	public static void saveSkyblockPlayer(SkyblockPlayer player) {
@@ -176,14 +180,12 @@ public class Utils {
 			NBTInputStream input = new NBTInputStream(fis);
 
 			Tag tag = input.readTag();
-			System.out.println(tag);
 
 			CompoundMap compound = ((CompoundTag) tag).getValue();
 			Tag palette = compound.get("Palette");
 			Tag width = compound.get("Width");
 			Tag height = compound.get("Height");
 			Tag length = compound.get("Length");
-			System.out.println(((short) width.getValue()));
 			Map<Integer, SkyBlockData> data = new HashMap<>();
 			List<Integer> blocks = new ArrayList<>();
 			Tag blocktag = compound.get("BlockData");
@@ -199,19 +201,15 @@ public class Utils {
 				key = key.replace("]", "");
 				String matdat = "";
 				String matna = "";
-				System.out.println("Key: " + key);
 				if (key.contains(" ")) {
 					matdat = key.split(":")[0].split(" ")[1];
 					matna = key.split(":")[0].split(" ")[0];
 				}
-				System.out.println("MATNA: " + matna);
-				System.out.println("MATDAT: " + matdat);
 				if (matna == "")
 					matna = key.split(":")[0];
 				data.put(Integer.parseInt(key.split(":")[1]),
 						new SkyBlockData(Material.valueOf(matna.toUpperCase()), matdat));
 
-				System.out.println(key);
 			}
 
 			input.close();

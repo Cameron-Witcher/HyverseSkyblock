@@ -28,11 +28,16 @@ public class SkyblockPlayer {
 		if(!islands.contains(id+"")) {
 			islands.add(id+"");
 		}
+		save();
 		
 	}
 	
+	private void save() {
+		Utils.saveSkyblockPlayer(this);
+	}
 	public void setIsland(String island) {
 		cisland = island;
+		save();
 	}
 	public String getIsland() {
 		return cisland;

@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.quickscythe.hyverse.skyblock.commands.IslandCommand;
+import me.quickscythe.hyverse.skyblock.listeners.BlockListener;
 import me.quickscythe.hyverse.skyblock.listeners.InventoryListener;
 import me.quickscythe.hyverse.skyblock.utils.islands.IslandManager;
 
@@ -52,6 +53,7 @@ public class Main extends JavaPlugin {
 		
 		
 		new InventoryListener(this);
+		new BlockListener(this);
 		new IslandCommand("island", this);
 		
 		

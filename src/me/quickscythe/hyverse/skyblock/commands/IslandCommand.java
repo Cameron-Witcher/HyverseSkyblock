@@ -30,53 +30,119 @@ public class IslandCommand implements CommandExecutor {
 					player.openInventory(IslandManager.getIslandTypeSelectorGUI(player));
 				}
 				if (pl.getIslands().size() == 1) {
-					player.setMetadata("islandmenu", new FixedMetadataValue(Main.getPlugin(), "1"));
-					player.openInventory(IslandManager.getIslandMenuGUI(player, Integer.parseInt(pl.getIslands().toArray()[0]+"")));
+					player.setMetadata("islandmenu", new FixedMetadataValue(Main.getPlugin(), pl.getIslands().toArray()[0]));
+					player.openInventory(IslandManager.getIslandMenuGUI(player,
+							Integer.parseInt(pl.getIslands().toArray()[0] + "")));
 				}
-				if(pl.getIslands().size() > 1) {
+				if (pl.getIslands().size() > 1) {
 					player.setMetadata("islandselector", new FixedMetadataValue(Main.getPlugin(), "true"));
 					player.openInventory(IslandManager.getIslandSelectorGUI(player, pl.getIslands()));
 				}
 
 			}
-			if(args.length > 0) {
-				if(args[0].equalsIgnoreCase("help")) {
+			if (args.length > 0) {
+				if (args[0].equalsIgnoreCase("create")) {
+					player.setMetadata("islandtypeselector", new FixedMetadataValue(Main.getPlugin(), "true"));
+					player.openInventory(IslandManager.getIslandTypeSelectorGUI(player));
+				}
+				if (args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("remove")) {
+					String is = pl.getIsland();
+					if (args.length == 2)
+						is = args[1];
+					if (is == "") {
+						player.sendMessage(CoreUtils.colorize(
+								"&eSkyblock &7>&f You must be on an island or specify an island to use this command."));
+						return true;
+					}
+					if (player.hasPermission("hyverse.skyblock.cmd.admin.delete")) {
+						if (!pl.getIslands().contains(is))
+							player.sendMessage(CoreUtils
+									.colorize("&eSkyblock &7>&f You don't own this island. Using admin override."));
+						IslandManager.destroyIsland(Integer.parseInt(is));
+					} else {
+						if (pl.getIslands().contains(is))
+
+							IslandManager.destroyIsland(Integer.parseInt(is));
+						else
+							player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Sorry you don't own that island."));
+					}
+
+				}
+				if (args[0].equalsIgnoreCase("regen") || args[0].equalsIgnoreCase("regenerate")) {
+					String is = pl.getIsland();
+					if (args.length == 2)
+						is = args[1];
+					if (is == "") {
+						player.sendMessage(CoreUtils.colorize(
+								"&eSkyblock &7>&f You must be on an island or specify an island to use this command."));
+						return true;
+					}
+					if (player.hasPermission("hyverse.skyblock.cmd.admin.regen")) {
+						if (!pl.getIslands().contains(is))
+							player.sendMessage(CoreUtils
+									.colorize("&eSkyblock &7>&f You don't own this island. Using admin override."));
+						IslandManager.getIsland(Integer.parseInt(is)).regen();
+					} else {
+						if (pl.getIslands().contains(is))
+							IslandManager.getIsland(Integer.parseInt(is)).regen();
+						else
+							player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Sorry you don't own that island."));
+					}
+
+				}
+				if (args[0].equalsIgnoreCase("help")) {
 					sender.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Below is a list of skyblock commands:"));
-					if(player.hasPermission("hyverse.skyblock.cmd.admin")) 
-						player.sendMessage(CoreUtils.colorize("&aKey: &c▬&a: Admin, &e▬&a: Other"));
-					
+					if (player.hasPermission("hyverse.skyblock.cmd.admin"))
+						player.sendMessage(CoreUtils.colorize("&aKey: &c■&a: Admin, &e■&a: Other"));
+
 					player.sendMessage(CoreUtils.colorize("&e - /is -> Opens GUI menu."));
 					player.sendMessage(CoreUtils.colorize("&e - /is help -> Shows these help messages."));
-					player.sendMessage(CoreUtils.colorize("&e - /is home [islandID] -> Teleports you to the spawn point of the island you are currently on, or the island you specify with the optional [islandID] argument.."));
-					if(player.hasPermission("hyverse.skyblock.cmd.admin.is.reset.metadata")) player.sendMessage(CoreUtils.colorize("&c - /is reset metadata [player] -> Resets you metadata or the metadata of the player specified with [player]"));
+					player.sendMessage(CoreUtils.colorize(
+							"&e - /is home [islandID] -> Teleports you to the spawn point of the island you are currently on, or the island you specify with the optional [islandID] argument.."));
+					if (player.hasPermission("hyverse.skyblock.cmd.admin.is.reset.metadata"))
+						player.sendMessage(CoreUtils.colorize(
+								"&c - /is reset metadata [player] -> Resets you metadata or the metadata of the player specified with [player]"));
+					player.sendMessage(CoreUtils.colorize(
+							"&e - /is regen|regenerate [islandID] -> Regenerates current or specified island."));
+					player.sendMessage(CoreUtils.colorize(
+							"&e - /is delete|remove [islandID] -> Deletes current or specified island."));
 				}
-				if(args[0].equalsIgnoreCase("home")) {
+				if (args[0].equalsIgnoreCase("home")) {
 					String home = pl.getIsland();
-					if(args.length == 2) 
+					if (args.length == 2)
 						home = args[1];
-					if(home.equals("")) {
+					if (home.equals("") && pl.getIslands().size() == 0) {
 						player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Sorry you must join an island first."));
+						return true;
 					}
-					if(player.hasPermission("hyverse.skyblock.cmd.admin.home")) {
+					if (home.equals("") && pl.getIslands().size() != 0) {
+						home = pl.getIslands().toArray()[0]+"";
+					}
+//					Bukkit.broadcastMessage(home);
+//					Bukkit.broadcastMessage(""+IslandManager.getIslands().size());
+//					for(String is : IslandManager.getIslands()) {
+//						Bukkit.broadcastMessage(is + " -> " + ((IslandManager.getIsland(Integer.parseInt(is)) == null) ? "Null" : "Not null"));
+//					}
+					if (player.hasPermission("hyverse.skyblock.cmd.admin.home")) {
 						IslandManager.getIsland(Integer.parseInt(home)).join(player);
 					} else {
-						if(pl.getIslands().contains(home)) {
+						if (pl.getIslands().contains(home)) {
 							IslandManager.getIsland(Integer.parseInt(home)).join(player);
 						} else {
 							player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Sorry you don't own that island."));
 						}
 					}
-					
-					
+
 				}
-				if(args[0].equalsIgnoreCase("reset")) {
-					if(args.length >= 2) {
-						if(args[1].equalsIgnoreCase("metadata")) {
+				if (args[0].equalsIgnoreCase("reset")) {
+					if (args.length >= 2) {
+						if (args[1].equalsIgnoreCase("metadata")) {
 							String plr = player.getName();
-							if(args.length == 3) {
+							if (args.length == 3) {
 								plr = args[2];
-								if(Bukkit.getPlayer(plr) == null) {
-									player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f A player must me online to reset their metadata"));
+								if (Bukkit.getPlayer(plr) == null) {
+									player.sendMessage(CoreUtils.colorize(
+											"&eSkyblock &7>&f A player must me online to reset their metadata"));
 									return true;
 								}
 							}
@@ -85,17 +151,40 @@ public class IslandCommand implements CommandExecutor {
 							Bukkit.getPlayer(plr).removeMetadata("islandselector", Main.getPlugin());
 						}
 					} else {
-						player.sendMessage(CoreUtils.colorize("&c - /is reset metadata [player] -> Resets you metadata or the metadata of the player specified with [player]."));
+						player.sendMessage(CoreUtils.colorize(
+								"&c - /is reset metadata [player] -> Resets you metadata or the metadata of the player specified with [player]."));
 					}
-					
+
 				}
 			}
 
 //			IslandManager.nextIsland(player, IslandManager.types.get(0)).build();
 
 		} else {
-			sender.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Below is a list of admin commands:"));
-			sender.sendMessage(CoreUtils.colorize("&e - /is reset metadata [player] -> Resets you metadata or the metadata of the player specified with [player]"));
+			if (args.length == 0) {
+				sender.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Below is a list of admin commands:"));
+				sender.sendMessage(CoreUtils.colorize(
+						"&e - /is reset metadata <player> -> Resets you metadata or the metadata of the player specified with [player]"));
+				sender.sendMessage(
+						CoreUtils.colorize("&e - /is regen|regenerate <islandID> -> Regenerates specified island."));
+			}
+			if(args.length > 0) {
+				if(args[0].equalsIgnoreCase("regen") || args[0].equalsIgnoreCase("regenerate")) {
+					
+					if(args.length == 2) 
+						IslandManager.getIsland(Integer.parseInt(args[1])).regen();
+					else 
+						sender.sendMessage(
+								CoreUtils.colorize("&e - /is regen|regenerate <islandID> -> Regenerates specified island."));
+				}
+				if(args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("remove")) {
+					if(args.length == 2) 
+						IslandManager.destroyIsland(Integer.parseInt(args[1]));
+					else 
+						sender.sendMessage(
+								CoreUtils.colorize("&e - /is delete|remove <islandID> -> Deletes specified island."));
+				}
+			}
 		}
 		return true;
 	}

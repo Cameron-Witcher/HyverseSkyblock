@@ -10,9 +10,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import com.github.yannicklamprecht.worldborder.api.BorderAPI;
-import com.github.yannicklamprecht.worldborder.api.WorldBorderApi;
-
 import me.quickscythe.hyverse.skyblock.Main;
 import me.quickscythe.hyverse.skyblock.utils.Utils;
 import me.quickscythe.hyverse.skyblock.utils.islands.Island;
@@ -23,6 +20,24 @@ public class InventoryListener implements Listener {
 
 	public InventoryListener(Main plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
+	}
+	
+	@EventHandler
+	public void onInventoryClose(InventoryCloseEvent e) {
+		if(e.getPlayer().hasMetadata("islandmenu") || e.getPlayer().hasMetadata("islandselector") || e.getPlayer().hasMetadata("islandtypeselector")) {
+			Bukkit.getScheduler().runTaskLater(Main.getPlugin(), new Runnable() {
+
+				@Override
+				public void run() {
+					if(e.getPlayer().getOpenInventory() == null) {
+						e.getPlayer().removeMetadata("islandmenu", Main.getPlugin());
+						e.getPlayer().removeMetadata("islandselector", Main.getPlugin());
+						e.getPlayer().removeMetadata("islandtypeselector", Main.getPlugin());
+					}
+				}
+				
+			}, 3*20);
+		}
 	}
 
 	@EventHandler
@@ -49,7 +64,9 @@ public class InventoryListener implements Listener {
 
 			for (IslandType itype : IslandManager.types) {
 				if (e.getCurrentItem().getType().equals(itype.getGUIItem().getType())) {
+					
 					Island is = IslandManager.nextIsland((Player) e.getWhoClicked(), itype);
+					Utils.getSkyblockPlayer(e.getWhoClicked().getUniqueId()).addIsland(is.getID());
 					is.join((Player)e.getWhoClicked());
 					e.getWhoClicked().removeMetadata("islandtypeselector", Main.getPlugin());
 					break;
@@ -73,9 +90,7 @@ public class InventoryListener implements Listener {
 			}
 
 			if (e.getCurrentItem().getType().equals(Material.GRASS_BLOCK)) {
-				is.destroy_SOFT();
-				is.build();
-				is.join((Player)e.getWhoClicked());
+				is.destroy().build().join((Player)e.getWhoClicked());
 				e.getWhoClicked().removeMetadata("islandmenu", Main.getPlugin());
 
 			}

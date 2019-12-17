@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -35,6 +36,10 @@ public class IslandManager {
 
 	private static int HEIGHT = 30;
 	public static int PLOT_SIZE = 15;
+	
+	public static Set<String> getIslands(){
+		return islands.keySet();
+	}
 
 	public static void registerIslands() {
 
@@ -113,6 +118,8 @@ public class IslandManager {
 		}
 
 	}
+	
+
 
 	public static void destroyIsland(Island is) {
 		is.deactivate();
