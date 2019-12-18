@@ -34,6 +34,7 @@ import me.quickscythe.hyversecore.utils.CoreUtils;
 public class Utils {
 
 	static Map<UUID, SkyblockPlayer> sbplayers = new HashMap<>();
+	public static Map<String, Integer> rarities = new HashMap<>();
 	static World spawnWorld = null;
 	static World skyblockWorld = null;
 	static WorldBorderApi wbapi = null;
@@ -207,6 +208,7 @@ public class Utils {
 				}
 				if (matna == "")
 					matna = key.split(":")[0];
+				if(matna.equalsIgnoreCase("__RESERVED__")) continue;
 				data.put(Integer.parseInt(key.split(":")[1]),
 						new SkyBlockData(Material.valueOf(matna.toUpperCase()), matdat));
 
@@ -221,6 +223,10 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static void setRarity(String material, int percent) {
+		rarities.put(material,percent);
 	}
 
 }

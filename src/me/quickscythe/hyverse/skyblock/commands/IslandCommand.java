@@ -30,7 +30,8 @@ public class IslandCommand implements CommandExecutor {
 					player.openInventory(IslandManager.getIslandTypeSelectorGUI(player));
 				}
 				if (pl.getIslands().size() == 1) {
-					player.setMetadata("islandmenu", new FixedMetadataValue(Main.getPlugin(), pl.getIslands().toArray()[0]));
+					player.setMetadata("islandmenu",
+							new FixedMetadataValue(Main.getPlugin(), pl.getIslands().toArray()[0]));
 					player.openInventory(IslandManager.getIslandMenuGUI(player,
 							Integer.parseInt(pl.getIslands().toArray()[0] + "")));
 				}
@@ -46,9 +47,7 @@ public class IslandCommand implements CommandExecutor {
 					player.openInventory(IslandManager.getIslandTypeSelectorGUI(player));
 				}
 				if (args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("remove")) {
-					String is = pl.getIsland();
-					if (args.length == 2)
-						is = args[1];
+					String is = args.length == 2 ? args[1] : pl.getIsland();
 					if (is == "") {
 						player.sendMessage(CoreUtils.colorize(
 								"&eSkyblock &7>&f You must be on an island or specify an island to use this command."));
@@ -69,9 +68,7 @@ public class IslandCommand implements CommandExecutor {
 
 				}
 				if (args[0].equalsIgnoreCase("regen") || args[0].equalsIgnoreCase("regenerate")) {
-					String is = pl.getIsland();
-					if (args.length == 2)
-						is = args[1];
+					String is = args.length == 2 ? args[1] : pl.getIsland();
 					if (is == "") {
 						player.sendMessage(CoreUtils.colorize(
 								"&eSkyblock &7>&f You must be on an island or specify an island to use this command."));
@@ -104,19 +101,17 @@ public class IslandCommand implements CommandExecutor {
 								"&c - /is reset metadata [player] -> Resets you metadata or the metadata of the player specified with [player]"));
 					player.sendMessage(CoreUtils.colorize(
 							"&e - /is regen|regenerate [islandID] -> Regenerates current or specified island."));
-					player.sendMessage(CoreUtils.colorize(
-							"&e - /is delete|remove [islandID] -> Deletes current or specified island."));
+					player.sendMessage(CoreUtils
+							.colorize("&e - /is delete|remove [islandID] -> Deletes current or specified island."));
 				}
 				if (args[0].equalsIgnoreCase("home")) {
-					String home = pl.getIsland();
-					if (args.length == 2)
-						home = args[1];
+					String home = args.length == 2 ? args[1] : pl.getIsland();
 					if (home.equals("") && pl.getIslands().size() == 0) {
 						player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Sorry you must join an island first."));
 						return true;
 					}
 					if (home.equals("") && pl.getIslands().size() != 0) {
-						home = pl.getIslands().toArray()[0]+"";
+						home = pl.getIslands().toArray()[0] + "";
 					}
 //					Bukkit.broadcastMessage(home);
 //					Bukkit.broadcastMessage(""+IslandManager.getIslands().size());
@@ -168,19 +163,19 @@ public class IslandCommand implements CommandExecutor {
 				sender.sendMessage(
 						CoreUtils.colorize("&e - /is regen|regenerate <islandID> -> Regenerates specified island."));
 			}
-			if(args.length > 0) {
-				if(args[0].equalsIgnoreCase("regen") || args[0].equalsIgnoreCase("regenerate")) {
-					
-					if(args.length == 2) 
+			if (args.length > 0) {
+				if (args[0].equalsIgnoreCase("regen") || args[0].equalsIgnoreCase("regenerate")) {
+
+					if (args.length == 2)
 						IslandManager.getIsland(Integer.parseInt(args[1])).regen();
-					else 
-						sender.sendMessage(
-								CoreUtils.colorize("&e - /is regen|regenerate <islandID> -> Regenerates specified island."));
+					else
+						sender.sendMessage(CoreUtils
+								.colorize("&e - /is regen|regenerate <islandID> -> Regenerates specified island."));
 				}
-				if(args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("remove")) {
-					if(args.length == 2) 
+				if (args[0].equalsIgnoreCase("delete") || args[0].equalsIgnoreCase("remove")) {
+					if (args.length == 2)
 						IslandManager.destroyIsland(Integer.parseInt(args[1]));
-					else 
+					else
 						sender.sendMessage(
 								CoreUtils.colorize("&e - /is delete|remove <islandID> -> Deletes specified island."));
 				}

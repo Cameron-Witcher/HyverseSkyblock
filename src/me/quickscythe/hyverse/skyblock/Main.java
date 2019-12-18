@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import me.quickscythe.hyverse.skyblock.commands.IslandCommand;
 import me.quickscythe.hyverse.skyblock.listeners.BlockListener;
 import me.quickscythe.hyverse.skyblock.listeners.InventoryListener;
+import me.quickscythe.hyverse.skyblock.utils.Utils;
 import me.quickscythe.hyverse.skyblock.utils.islands.IslandManager;
 
 
@@ -26,7 +27,38 @@ public class Main extends JavaPlugin {
 		if(!getConfig().isSet("SPAWN_WORLD")) getConfig().set("SPAWN_WORLD", "Spawn");
 		if(!getConfig().isSet("SKYBLOCK_WORLD")) getConfig().set("SKYBLOCK_WORLD", "Skyblock");
 		
+		//Register block rarities
+		if(!getConfig().isSet("Options.Generator.STONE")) getConfig()       .set("Options.Generator.STONE",        "50");
+		if(!getConfig().isSet("Options.Generator.GRAVEL")) getConfig()      .set("Options.Generator.GRAVEL",       "30");
+		if(!getConfig().isSet("Options.Generator.DIAMOND_ORE")) getConfig() .set("Options.Generator.DIAMOND_ORE",  "10");
+		if(!getConfig().isSet("Options.Generator.COAL_ORE")) getConfig()    .set("Options.Generator.COAL_ORE",     "30");
+		if(!getConfig().isSet("Options.Generator.IRON_ORE")) getConfig()    .set("Options.Generator.IRON_ORE",     "30");
+		if(!getConfig().isSet("Options.Generator.GOLD_ORE")) getConfig()    .set("Options.Generator.GOLD_ORE",     "20");
+		if(!getConfig().isSet("Options.Generator.LAPIS_ORE")) getConfig()   .set("Options.Generator.LAPIS_ORE",    "25");
+		if(!getConfig().isSet("Options.Generator.QUARTZ_ORE")) getConfig()  .set("Options.Generator.QUARTZ_ORE",   "20");
+		if(!getConfig().isSet("Options.Generator.EMERALD_ORE")) getConfig() .set("Options.Generator.EMERALD_ORE",  "5");
+		if(!getConfig().isSet("Options.Generator.REDSTONE_ORE")) getConfig().set("Options.Generator.REDSTONE_ORE", "25");
+		
 		saveConfig();
+		
+		
+		Utils.setRarity("STONE", getConfig().getInt("Options.Generator.STONE"));
+		Utils.setRarity("GRAVEL", getConfig().getInt("Options.Generator.GRAVEL"));
+		Utils.setRarity("DIAMOND_ORE", getConfig().getInt("Options.Generator.DIAMOND_ORE"));
+		Utils.setRarity("COAL_ORE", getConfig().getInt("Options.Generator.COAL_ORE"));
+		Utils.setRarity("IRON_ORE", getConfig().getInt("Options.Generator.IRON_ORE"));
+		Utils.setRarity("LAPIS_ORE", getConfig().getInt("Options.Generator.LAPIS_ORE"));
+		Utils.setRarity("QUARTZ_ORE", getConfig().getInt("Options.Generator.QUARTZ_ORE"));
+		Utils.setRarity("GOLD_ORE", getConfig().getInt("Options.Generator.GOLD_ORE"));
+		Utils.setRarity("REDSTONE_ORE", getConfig().getInt("Options.Generator.REDSTONE_ORE"));
+		Utils.setRarity("EMERALD_ORE", getConfig().getInt("Options.Generator.EMERALD_ORE"));
+		
+		
+		
+		
+		
+		
+		
 		if(!getServer().getPluginManager().isPluginEnabled("HyverseCore") || !getServer().getPluginManager().isPluginEnabled("VoidGenerator")){
 			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&e&l" + getDescription().getName() + " &f>&7 Can't find HyverseCore. Trying again.. Attempt " + attempt + " out of " + maxattempts));
 			attempt+=1;

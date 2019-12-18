@@ -23,6 +23,7 @@ import me.quickscythe.hyverse.skyblock.utils.Schematic;
 import me.quickscythe.hyverse.skyblock.utils.SkyBlockData;
 import me.quickscythe.hyverse.skyblock.utils.SkyblockPlayer;
 import me.quickscythe.hyverse.skyblock.utils.Utils;
+import me.quickscythe.hyverse.skyblock.utils.runnables.CheckIslandJoinable;
 import me.quickscythe.hyversecore.utils.CoreUtils;
 
 public class Island {
@@ -70,7 +71,6 @@ public class Island {
 		this.type = type;
 		// TODO DO NOT DO THIS IN ANY RELEASE
 		lgloc = new Location(Utils.getSkyblockWorld(), x, 30, z);
-		active = true;
 		this.owner = owner;
 		this.file = new File(Main.getPlugin().getDataFolder() + "/islands/" + id + ".yml");
 		if (!file.exists()) {
@@ -95,7 +95,11 @@ public class Island {
 		return this;
 	}
 
-	public Island join(Player player) {
+	public void join(Player player) {
+		if(!active) {
+			Bukkit.getScheduler().runTaskLater(Main.getPlugin(), new CheckIslandJoinable(player.getUniqueId(),this), 40);
+			return;
+		}
 		if (!inventories.containsKey(player.getUniqueId()))
 			inventories.put(player.getUniqueId(), new ArrayList<ItemStack>());
 		SkyblockPlayer pl = Utils.getSkyblockPlayer(player.getUniqueId());
@@ -120,7 +124,7 @@ public class Island {
 		}
 		player.sendMessage(CoreUtils.colorize("&eSkyblock &7>&f Teleporting to Island: " + id));
 		player.teleport(spawnLoc);
-		return this;
+		
 
 	}
 
@@ -235,9 +239,10 @@ public class Island {
 
 	public Island regen() {
 		destroy().build();
-		for(UUID uid : inventories.keySet()) {
-			if(Bukkit.getPlayer(uid) == null) continue;
-			if(Utils.getSkyblockPlayer(uid).getIsland().equals(id+"")) {
+		for (UUID uid : inventories.keySet()) {
+			if (Bukkit.getPlayer(uid) == null)
+				continue;
+			if (Utils.getSkyblockPlayer(uid).getIsland().equals(id + "")) {
 				join(Bukkit.getPlayer(uid));
 			}
 		}
@@ -248,24 +253,23 @@ public class Island {
 		Utils.getSkyblockPlayer(owner).removeIsland(id);
 		Utils.saveSkyblockPlayer(owner);
 		active = false;
-		
 
-		for(UUID uid : inventories.keySet()) {
-			if(Bukkit.getPlayer(uid) == null) continue;
-			if(Utils.getSkyblockPlayer(uid).getIsland().equals(id+"")) {
+		for (UUID uid : inventories.keySet()) {
+			if (Bukkit.getPlayer(uid) == null)
+				continue;
+			if (Utils.getSkyblockPlayer(uid).getIsland().equals(id + "")) {
 				leave(Bukkit.getPlayer(uid));
 				Bukkit.getPlayer(uid).teleport(Utils.getSpawnWorld().getSpawnLocation());
 			}
 		}
 		owner = null;
-		
+
 		IslandManager.saveIsland(this);
 		destroy();
 		return this;
 	}
 
 	protected Island reActivate(Player owner, IslandType type) {
-		active = true;
 		this.type = type;
 		this.owner = owner.getUniqueId();
 		IslandManager.saveIsland(this);
@@ -305,7 +309,15 @@ public class Island {
 					int index = (y * schem.getLength() + z) * schem.getWidth() + x;
 					Block block = new Location(Utils.getSkyblockWorld(), this.x + x, y + IslandManager.getHeight(),
 							this.z + z).getBlock();
-					if (((SkyBlockData) (schem.getData().get(schem.getBlocks().toArray()[index]))).getMaterial()
+					if (((SkyBlockData) (
+							schem
+							.getData()
+							.get(
+									schem
+									.getBlocks()
+									.toArray()
+									[index])))
+							.getMaterial()
 							.equals(Material.AIR))
 						continue;
 					if (((SkyBlockData) (schem.getData().get(schem.getBlocks().toArray()[index]))).getMaterial()
@@ -319,7 +331,9 @@ public class Island {
 				}
 			}
 		}
+		active = true;
 		save();
+
 		return this;
 
 	}
